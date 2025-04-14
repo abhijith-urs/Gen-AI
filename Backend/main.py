@@ -13,10 +13,10 @@ app = FastAPI()
 # 🚗 Vehicle Simulator
 # -----------------------
 
-vehicle_ids = ["VH200001", "VH200002", "VH200003"]
+vehicle_ids = ["VH01", "VH02", "VH03"]
 
 vehicle_info = {
-    "VH200001": {
+    "VH01": {
         "make_year": 2017,
         "total_odometer": 65000,
         "last_service_miles": 64000,
@@ -25,7 +25,7 @@ vehicle_info = {
         "last_tire_rotation_date": datetime.now() - timedelta(days=180),
         "last_brake_inspection_date": datetime.now() - timedelta(days=200),
     },
-    "VH200002": {
+    "VH02": {
         "make_year": 2019,
         "total_odometer": 68800,
         "last_service_miles": 67500,
@@ -34,7 +34,7 @@ vehicle_info = {
         "last_tire_rotation_date": datetime.now() - timedelta(days=120),
         "last_brake_inspection_date": datetime.now() - timedelta(days=160),
     },
-    "VH200003": {
+    "VH03": {
         "make_year": 2021,
         "total_odometer": 70300,
         "last_service_miles": 69500,
