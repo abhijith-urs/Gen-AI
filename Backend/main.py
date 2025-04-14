@@ -1,13 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
-import random
+from pydantic import BaseModel
 from datetime import datetime, timedelta
+import random
+
+from Backend.llm_agent import process_query_with_ai, process_query_with_crewai
+from Backend.utils import evaluate_vehicle_status
 
 app = FastAPI()
 
+# -----------------------
+# 🚗 Vehicle Simulator
+# -----------------------
+
 vehicle_ids = ["VH200001", "VH200002", "VH200003"]
 
-# Static Base Information for Vehicles
 vehicle_info = {
     "VH200001": {
         "make_year": 2017,
@@ -41,12 +48,9 @@ vehicle_info = {
 
 def generate_vehicle_data(vehicle_id):
     info = vehicle_info[vehicle_id]
-
-    # Simulate today's driven miles
     today_driven = random.randint(5, 50)
     info["total_odometer"] += today_driven
 
-    # Constants
     oil_change_interval = 5000
     tire_rotation_interval = 8000
     brake_inspection_interval = 12000
@@ -120,8 +124,9 @@ def generate_vehicle_data(vehicle_id):
 @app.get("/")
 def root():
     return {
-        "message": "✅ VoltAI Vehicle Simulator API is running!",
-        "endpoints": ["/vehicles", "/vehicle/{vehicle_id}"]
+        "message": "✅ VoltAI Unified Backend is running!",
+        "endpoints":
+        ["/vehicles", "/vehicle/{vehicle_id}", "/ask", "/ask-refined"]
     }
 
 
@@ -137,3 +142,35 @@ def get_vehicle(vehicle_id: str):
         return JSONResponse(content={"error": "Vehicle ID not found"},
                             status_code=404)
     return JSONResponse(content=generate_vehicle_data(vehicle_id))
+
+
+# -----------------------
+# 🤖 VoltAI LLM Features
+# -----------------------
+
+
+class VehicleData(BaseModel):
+    temperature: float
+    oil_level: float
+    fuel_level: float
+    tire_pressure_FL: float
+    tire_pressure_FR: float
+    tire_pressure_RL: float
+    tire_pressure_RR: float
+    engine_light_on: bool
+
+
+@app.post("/evaluate")
+def evaluate_vehicle(data: VehicleData):
+    checks = evaluate_vehicle_status(data.dict())
+    return {"status": checks}
+
+
+@app.get("/ask")
+def ask_vehicle_assistant(query: str = Query(...)):
+    return {"response": process_query_with_ai(query)}
+
+
+@app.get("/ask-refined")
+def ask_vehicle_assistant_refined(query: str = Query(...)):
+    return {"response": process_query_with_crewai(query)}

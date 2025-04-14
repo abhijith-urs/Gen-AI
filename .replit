@@ -1,0 +1,15 @@
+# modules = ["python-3.12"]
+# run = "run = \"uvicorn simulate_vehicle_api:app --host=0.0.0.0 --port=8000\""
+
+# [nix]
+# channel = "stable-24_05"
+
+# [deployment]
+# run = ["sh", "-c", "run = \"uvicorn simulate_vehicle_api:app --host=0.0.0.0 --port=8000\""]
+# run = "uvicorn Backend.simulate_vehicle_api:app --host=0.0.0.0 --port=8000"
+run = "uvicorn Backend.main:app --host 0.0.0.0 --port 8000"
+modules = ["python-3.11"]
+
+[[ports]]
+localPort = 8000
+externalPort = 80
